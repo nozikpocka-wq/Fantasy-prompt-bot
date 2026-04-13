@@ -5,7 +5,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 
 # ---------- НАСТРОЙКИ (ЗАМЕНИ НА СВОИ) ----------
 BOT_TOKEN = "8757443610:AAF8eLvL7jPrCrSYmukKP939E64A8sp6eLo"  # Токен от BotFather
-ТвойREF_ID = "fantasy-prompt-bot_onrender_com"реферальный код (цифры после ?ref= в ссылке)
+REF_ID = "pornworks.app/?refid=fantasy-prompt-bot_onrender_com"  # Твой реферальный код (цифры после ?ref= в ссылке)
 # ------------------------------------------------
 
 # Логирование (чтобы видеть ошибки)
