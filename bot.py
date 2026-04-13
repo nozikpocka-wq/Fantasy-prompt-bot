@@ -1,21 +1,21 @@
+import os
 import random
 import logging
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
-# ---------- НАСТРОЙКИ (ЗАМЕНИ НА СВОИ) ----------
-BOT_TOKEN = "8757443610:AAF8eLvL7jPrCrSYmukKP939E64A8sp6eLo"  # Токен от BotFather
-REF_ID = "pornworks.app/?refid=fantasy-prompt-bot_onrender_com"  # Твой реферальный код (цифры после ?ref= в ссылке)
-# ------------------------------------------------
+# ---------- НАСТРОЙКИ ----------
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+REF_ID = os.environ.get("REF_ID", "fantasy")
 
-# Логирование (чтобы видеть ошибки)
-logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
+if not BOT_TOKEN:
+    raise ValueError("BOT_TOKEN не задан в переменных окружения!")
 
-# База тегов (та же, что в предыдущем генераторе)
+# ---------- БАЗА ТЕГОВ ----------
 fantasy_data = {
-    "races": ["elf", "dark elf", "orc female", "demoness", "succubus", "tiefling", "goblin girl",
-              "vampire lady", "angel", "fallen angel", "dragon kin", "kobold", "slime girl",
-              "wolf girl", "cat girl", "harpy", "lamia", "centaur woman"],
+    "races": ["elf", "dark elf", "orc female", "demoness", "succubus", "tiefling",
+              "goblin girl", "vampire lady", "angel", "fallen angel", "dragon kin",
+              "kobold", "slime girl", "wolf girl", "cat girl", "harpy", "lamia", "centaur woman"],
     "bodies": ["muscular", "curvy", "thick thighs", "wide hips", "toned abs", "small breasts",
                "huge breasts", "petite", "tall", "athletic", "plump", "pregnant", "sweat",
                "oiled skin", "visible veins", "soft skin", "scarred body", "tattooed"],
@@ -46,44 +46,39 @@ def generate_prompt():
     bg = random.choice(fantasy_data["backgrounds"])
     effect = random.choice(fantasy_data["effects"])
     light = random.choice(fantasy_data["lighting"])
-    
     prompt = (f"{race}, {body}, {face}, wearing {outfit}, {action}, {bg}, {effect}, {light}, "
               f"masterpiece, best quality, nsfw, cgi, intricate details")
     return prompt
 
-# Команда /start
+# ---------- КОМАНДЫ БОТА ----------
+logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🔥 *Hardcore Fantasy Prompt Bot* 🔥\n\n"
-        "Я генерирую случайные промпты для PornWorks AI (стиль Hardcore Fantasy).\n\n"
         "Команды:\n"
-        "/prompt — получить один промпт\n"
-        "/link — твоя реферальная ссылка для генерации\n\n"
-        "Скопируй промпт, перейди по ссылке и вставь его в поле на сайте!",
+        "/prompt — получить случайный промпт\n"
+        "/link — реферальная ссылка PornWorks\n\n"
+        "Скопируй промпт, перейди по ссылке и вставь в поле генерации!",
         parse_mode="Markdown"
     )
 
-# Команда /prompt
 async def prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     p = generate_prompt()
     await update.message.reply_text(f"🎲 *Твой промпт:*\n\n`{p}`", parse_mode="Markdown")
 
-# Команда /link
 async def link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ref_link = f"https://pornworks.app/?ref={REF_ID}"
     await update.message.reply_text(
-        f"🔗 *Твоя реферальная ссылка:*\n{ref_link}\n\n"
-        f"Перейди по ней, зарегистрируйся и вставляй промпты из бота в поле генерации.",
+        f"🔗 *Твоя реферальная ссылка:*\n{ref_link}",
         parse_mode="Markdown"
     )
 
-# Запуск бота
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("prompt", prompt))
     app.add_handler(CommandHandler("link", link))
-    
     print("Бот запущен...")
     app.run_polling()
 
